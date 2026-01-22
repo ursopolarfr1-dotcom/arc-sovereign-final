@@ -171,8 +171,7 @@ const pageColors: Record<string, string> = {
 // ============================================
 const CONTRACT_ADDRESS = "0x4Ee7f03817Bf688c076B85c717f4bdE69d20ab54
 " 
-const CONTRACT_ABI = [
-	{
+const CONTRACT_ABI = [{
 		"inputs": [],
 		"name": "deposit",
 		"outputs": [],
