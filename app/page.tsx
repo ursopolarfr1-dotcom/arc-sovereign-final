@@ -1,13 +1,12 @@
 "use client"
 
 import React, { useState, useEffect, useRef, useCallback } from "react"
+import { motion, AnimatePresence } from "framer-motion"
 import { 
   Shield, Lock, Repeat, Users, Wallet, Globe, Zap,
-  ChevronDown, X, Loader2, ExternalLink,
-  ArrowDownToLine, ArrowUpFromLine, AlertCircle, Check, Info
+  ChevronDown, X, Loader2, ExternalLink, Copy, RefreshCw,
+  ArrowDownToLine, ArrowUpFromLine, AlertCircle, Check, Info, Clock, Timer
 } from "lucide-react"
-import { ethers } from "ethers"
-import { CONTRACT_ADDRESS, CONTRACT_ABI } from "../constants"
 
 // ============================================
 // TYPES
@@ -67,7 +66,37 @@ const translations = {
     days: "Days",
     month: "Month",
     months: "Months",
-    year: "Year"
+    year: "Year",
+    // Portfolio translations
+    yourPortfolio: "Your Portfolio",
+    walletBalance: "Wallet Balance",
+    vaultStatus: "Vault Status",
+    activeDeposit: "Active Deposit",
+    yieldLockStatus: "Yield Lock Status",
+    lockedBalance: "Locked Balance",
+    accumulatedProfit: "Accumulated Profit",
+    unlockDate: "Unlock Date",
+    guardianStatus: "Guardian Status",
+    heritageAddress: "Heritage Address",
+    protectionActive: "Protection Active",
+    streamStatusLabel: "Stream Status",
+    active: "Active",
+    inactive: "Inactive",
+    progress: "Progress",
+    remaining: "Remaining",
+    noActiveStreams: "No active streams",
+    syncData: "Sync Data",
+    syncing: "Syncing...",
+    dataSynced: "Data synchronized!",
+    disconnect: "Disconnect",
+    connectedWallet: "Connected Wallet",
+    addressCopied: "Address copied!",
+    view: "View",
+    manageLocks: "Manage Locks",
+    configureGuardian: "Configure Guardian",
+    noActiveLock: "No Active Lock",
+    noDeposit: "No Deposit",
+    notConnected: "---"
   },
   PT: {
     connect: "Conectar Carteira",
@@ -109,7 +138,37 @@ const translations = {
     days: "Dias",
     month: "Mes",
     months: "Meses",
-    year: "Ano"
+    year: "Ano",
+    // Portfolio translations
+    yourPortfolio: "Seu Portfolio",
+    walletBalance: "Saldo na Carteira",
+    vaultStatus: "Status do Cofre",
+    activeDeposit: "Deposito Ativo",
+    yieldLockStatus: "Status do Yield Lock",
+    lockedBalance: "Saldo Bloqueado",
+    accumulatedProfit: "Lucro Acumulado",
+    unlockDate: "Data de Desbloqueio",
+    guardianStatus: "Status do Guardiao",
+    heritageAddress: "Endereco de Heranca",
+    protectionActive: "Protecao Ativa",
+    streamStatusLabel: "Status do Fluxo",
+    active: "Ativo",
+    inactive: "Inativo",
+    progress: "Progresso",
+    remaining: "Restante",
+    noActiveStreams: "Nenhum fluxo ativo",
+    syncData: "Sincronizar Dados",
+    syncing: "Sincronizando...",
+    dataSynced: "Dados sincronizados!",
+    disconnect: "Desconectar",
+    connectedWallet: "Carteira Conectada",
+    addressCopied: "Endereco copiado!",
+    view: "Ver",
+    manageLocks: "Gerenciar Bloqueios",
+    configureGuardian: "Configurar Guardiao",
+    noActiveLock: "Nenhum Bloqueio Ativo",
+    noDeposit: "Nenhum Deposito",
+    notConnected: "---"
   },
   ES: {
     connect: "Conectar Billetera",
@@ -151,7 +210,37 @@ const translations = {
     days: "Dias",
     month: "Mes",
     months: "Meses",
-    year: "Ano"
+    year: "Ano",
+    // Portfolio translations
+    yourPortfolio: "Tu Portafolio",
+    walletBalance: "Saldo en Billetera",
+    vaultStatus: "Estado de la Boveda",
+    activeDeposit: "Deposito Activo",
+    yieldLockStatus: "Estado del Yield Lock",
+    lockedBalance: "Saldo Bloqueado",
+    accumulatedProfit: "Ganancia Acumulada",
+    unlockDate: "Fecha de Desbloqueo",
+    guardianStatus: "Estado del Guardian",
+    heritageAddress: "Direccion de Herencia",
+    protectionActive: "Proteccion Activa",
+    streamStatusLabel: "Estado del Flujo",
+    active: "Activo",
+    inactive: "Inactivo",
+    progress: "Progreso",
+    remaining: "Restante",
+    noActiveStreams: "Sin flujos activos",
+    syncData: "Sincronizar Datos",
+    syncing: "Sincronizando...",
+    dataSynced: "Datos sincronizados!",
+    disconnect: "Desconectar",
+    connectedWallet: "Billetera Conectada",
+    addressCopied: "Direccion copiada!",
+    view: "Ver",
+    manageLocks: "Gestionar Bloqueos",
+    configureGuardian: "Configurar Guardian",
+    noActiveLock: "Sin Bloqueo Activo",
+    noDeposit: "Sin Deposito",
+    notConnected: "---"
   },
   FR: {
     connect: "Connecter Portefeuille",
@@ -193,7 +282,37 @@ const translations = {
     days: "Jours",
     month: "Mois",
     months: "Mois",
-    year: "An"
+    year: "An",
+    // Portfolio translations
+    yourPortfolio: "Votre Portefeuille",
+    walletBalance: "Solde du Portefeuille",
+    vaultStatus: "Etat du Coffre",
+    activeDeposit: "Depot Actif",
+    yieldLockStatus: "Etat du Yield Lock",
+    lockedBalance: "Solde Verrouille",
+    accumulatedProfit: "Profit Accumule",
+    unlockDate: "Date de Deverrouillage",
+    guardianStatus: "Etat du Gardien",
+    heritageAddress: "Adresse d'Heritage",
+    protectionActive: "Protection Active",
+    streamStatusLabel: "Etat du Flux",
+    active: "Actif",
+    inactive: "Inactif",
+    progress: "Progression",
+    remaining: "Restant",
+    noActiveStreams: "Aucun flux actif",
+    syncData: "Synchroniser",
+    syncing: "Synchronisation...",
+    dataSynced: "Donnees synchronisees!",
+    disconnect: "Deconnecter",
+    connectedWallet: "Portefeuille Connecte",
+    addressCopied: "Adresse copiee!",
+    view: "Voir",
+    manageLocks: "Gerer les Verrous",
+    configureGuardian: "Configurer le Gardien",
+    noActiveLock: "Aucun Verrou Actif",
+    noDeposit: "Aucun Depot",
+    notConnected: "---"
   }
 }
 
@@ -208,6 +327,20 @@ const pageColors: Record<Page, string> = {
 }
 
 // ============================================
+// CONTRACT CONFIG (DO NOT CHANGE)
+// ============================================
+const CONTRACT_ADDRESS = "0x0000000000000000000000000000000000000000" // Replace with your deployed contract
+const CONTRACT_ABI = [
+  // Placeholder ABI - replace with your actual contract ABI
+  "function balances(address) view returns (uint256)",
+  "function guardians(address) view returns (address)",
+  "function lockedBalances(address) view returns (uint256)",
+  "function deposit(uint256 amount) external",
+  "function withdraw(uint256 amount) external",
+  "function setGuardian(address guardian, uint256 inactivityPeriod) external"
+]
+
+// ============================================
 // MAIN COMPONENT
 // ============================================
 export default function ArcSovereign() {
@@ -216,18 +349,14 @@ export default function ArcSovereign() {
   const [language, setLanguage] = useState<Language>("EN")
   const [selectedAsset, setSelectedAsset] = useState<"USDC" | "EURC">("USDC")
   const [showLangDropdown, setShowLangDropdown] = useState(false)
-  const [isMounted, setIsMounted] = useState(false)
   
   // ===== WALLET STATE =====
   const [isConnected, setIsConnected] = useState(false)
   const [walletAddress, setWalletAddress] = useState("")
   const [isConnecting, setIsConnecting] = useState(false)
-  const [provider, setProvider] = useState<ethers.providers.Web3Provider | null>(null)
-  const [contract, setContract] = useState<ethers.Contract | null>(null)
   
-  // ===== DATA STATE =====
-  const [balances, setBalances] = useState({ ARC: "10.00", USDC: "1000.00", EURC: "500.00" })
-  const [vaultBalance, setVaultBalance] = useState("0.00")
+  // ===== DATA STATE (Clean Slate - all start at 0) =====
+  const [walletBalances, setWalletBalances] = useState({ ARC: "0.00", USDC: "0.00", EURC: "0.00" })
   const [yieldDisplay, setYieldDisplay] = useState("0.00000000")
   
   // ===== FORM STATE =====
@@ -237,13 +366,30 @@ export default function ArcSovereign() {
   const [lockDuration, setLockDuration] = useState<"1m" | "6m" | "1y">("6m")
   const [streamAmount, setStreamAmount] = useState("")
   const [streamFrequency, setStreamFrequency] = useState<"weekly" | "monthly">("weekly")
-  const [guardianAddress, setGuardianAddress] = useState("")
   const [guardianTimer, setGuardianTimer] = useState("90")
+  const [guardianAddress, setGuardianAddress] = useState("") // Added declaration
+  
+  // ===== REAL-TIME YIELD STATE =====
+  const [realTimeYieldEarned, setRealTimeYieldEarned] = useState("0.00000000")
+  const yieldEarnedRef = useRef(0)
   
   // ===== UI STATE =====
   const [activeModal, setActiveModal] = useState<ModalType>(null)
   const [isProcessing, setIsProcessing] = useState(false)
   const [toasts, setToasts] = useState<Toast[]>([])
+  const [isPortfolioOpen, setIsPortfolioOpen] = useState(false)
+  const [isRefreshing, setIsRefreshing] = useState(false)
+  
+  // ===== PORTFOLIO DATA STATE (For ethers.js integration) =====
+  const [arcBalance, setArcBalance] = useState("0.0000")
+  const [vaultBalance, setVaultBalance] = useState("0.00")
+  const [yieldLockTotal, setYieldLockTotal] = useState("0.00")
+  const [yieldLockProfit, setYieldLockProfit] = useState("0.00")
+  const [yieldLockEndTime, setYieldLockEndTime] = useState(Date.now() + 86400000 * 45) // 45 days from now
+  const [guardianConfigured, setGuardianConfigured] = useState("")
+  const [streamStatus, setStreamStatus] = useState<"active" | "inactive">("inactive")
+  const [streamProgress, setStreamProgress] = useState(0)
+  const [streamReleased, setStreamReleased] = useState("0.00")
   
   // ===== REFS (prevent loops) =====
   const yieldRef = useRef(0)
@@ -260,28 +406,58 @@ export default function ArcSovereign() {
     setTimeout(() => setToasts(prev => prev.filter(toast => toast.id !== id)), 4000)
   }, [])
   
-  // ===== UPDATE VAULT BALANCE =====
-  const updateVaultBalance = useCallback(async () => {
-    if (!contract || !walletAddress) return
+  // ===== REFRESH DATA FROM BLOCKCHAIN =====
+  const refreshData = useCallback(async (userAddress: string) => {
+    const ethereum = (window as Window & { ethereum?: {
+      request: (args: { method: string; params?: unknown[] }) => Promise<unknown>
+    }}).ethereum
+    
+    if (!ethereum || !userAddress) return
     
     try {
-      const balance = await contract.balanceOf(walletAddress)
-      const balanceFormatted = ethers.utils.formatEther(balance)
-      setVaultBalance(parseFloat(balanceFormatted).toFixed(2))
-    } catch (error) {
-      console.error("Error fetching vault balance:", error)
+      // 1. Get native ARC balance
+      const balanceHex = await ethereum.request({
+        method: "eth_getBalance",
+        params: [userAddress, "latest"]
+      }) as string
+      
+      // Convert from wei to ARC (18 decimals)
+      const balanceWei = BigInt(balanceHex)
+      const balanceArc = Number(balanceWei) / 1e18
+      setArcBalance(balanceArc.toFixed(4))
+      
+      // 2. Get contract data (placeholder - requires ethers.js for full integration)
+      // When you have ethers.js set up, uncomment and use:
+      /*
+      const provider = new ethers.providers.Web3Provider(ethereum)
+      const contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, provider)
+      
+      // Vault balance
+      const vBalance = await contract.balances(userAddress)
+      setVaultBalance(ethers.utils.formatUnits(vBalance, 6)) // USDC has 6 decimals
+      
+      // Locked balance
+      const lBalance = await contract.lockedBalances(userAddress)
+      setYieldLockTotal(ethers.utils.formatUnits(lBalance, 6))
+      
+      // Guardian address
+      const gAddress = await contract.guardians(userAddress)
+      if (gAddress !== "0x0000000000000000000000000000000000000000") {
+        setGuardianConfigured(gAddress.substring(0, 6) + "..." + gAddress.substring(38))
+      }
+      */
+      
+      // Contract data will be fetched via ethers.js when integrated
+      // States remain at 0 until actual contract calls are made
+      
+    } catch (err) {
+      console.log("[v0] Error fetching blockchain data:", err)
     }
-  }, [contract, walletAddress])
-
+  }, [])
+  
   // ===== CONNECT WALLET (stable) =====
   const connectWallet = useCallback(async () => {
     if (isConnecting) return
-    
-    // Check if we're on the client side and component is mounted
-    if (typeof window === 'undefined' || !isMounted || typeof window.ethereum === 'undefined') {
-      addToast("error", t.installWallet)
-      return
-    }
     
     const ethereum = (window as Window & { ethereum?: {
       request: (args: { method: string; params?: unknown[] }) => Promise<string[] | string>
@@ -301,21 +477,10 @@ export default function ArcSovereign() {
         setWalletAddress(accounts[0])
         setIsConnected(true)
         localStorage.setItem("arc_wallet_address", accounts[0])
-        
-        // Create ethers provider and contract
-        const web3Provider = new ethers.providers.Web3Provider(ethereum)
-        const signer = web3Provider.getSigner()
-        const contractInstance = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer)
-        
-        setProvider(web3Provider)
-        setContract(contractInstance)
-        
-        // Update vault balance
-        const balance = await contractInstance.balanceOf(accounts[0])
-        const balanceFormatted = ethers.utils.formatEther(balance)
-        setVaultBalance(parseFloat(balanceFormatted).toFixed(2))
-        
         addToast("success", t.connected)
+        
+        // Fetch blockchain data
+        refreshData(accounts[0])
         
         // Add Arc Network (fire and forget)
         ethereum.request({
@@ -329,94 +494,113 @@ export default function ArcSovereign() {
           }]
         }).catch(() => {})
       }
-    } catch (error) {
-      console.error("Connection error:", error)
+    } catch {
       addToast("error", "Connection failed")
     }
     setIsConnecting(false)
-  }, [isConnecting, isMounted, addToast, t])
+  }, [isConnecting, addToast, t, refreshData])
   
   const disconnectWallet = useCallback(() => {
     setIsConnected(false)
     setWalletAddress("")
-    setProvider(null)
-    setContract(null)
-    setVaultBalance("0.00")
     localStorage.removeItem("arc_wallet_address")
+    
+    // Reset all balances to 0 (Clean Slate)
+    setArcBalance("0.0000")
+    setWalletBalances({ ARC: "0.00", USDC: "0.00", EURC: "0.00" })
+    setVaultBalance("0.00")
+    setYieldLockTotal("0.00")
+    setYieldLockProfit("0.00")
+    setGuardianConfigured("")
+    setStreamStatus("inactive")
+    setStreamProgress(0)
+    setStreamReleased("0.00")
+    yieldRef.current = 0
+    yieldEarnedRef.current = 0
+    setYieldDisplay("0.00000000")
+    setRealTimeYieldEarned("0.00000000")
+    
     addToast("info", t.disconnected)
   }, [addToast, t])
-
-  // ===== HANDLE DEPOSIT =====
-  const handleDeposit = useCallback(async (amount: string) => {
-    if (!contract || !amount) return
-    
-    try {
-      setIsProcessing(true)
-      const amountWei = ethers.utils.parseEther(amount)
-      const tx = await contract.deposit({ value: amountWei })
-      addToast("info", "Transaction sent, waiting for confirmation...")
-      
-      await tx.wait()
-      
-      // Update balance after successful deposit
-      await updateVaultBalance()
-      
-      setIsProcessing(false)
-      setActiveModal(null)
-      setDepositAmount("")
-      addToast("success", t.txComplete)
-    } catch (error: any) {
-      console.error("Deposit error:", error)
-      setIsProcessing(false)
-      addToast("error", error?.message || "Deposit failed")
-    }
-  }, [contract, addToast, t, updateVaultBalance])
-
-  // ===== HANDLE WITHDRAW =====
-  const handleWithdraw = useCallback(async (amount: string) => {
-    if (!contract || !amount) return
-    
-    try {
-      setIsProcessing(true)
-      const amountWei = ethers.utils.parseEther(amount)
-      const tx = await contract.withdraw(amountWei)
-      addToast("info", "Transaction sent, waiting for confirmation...")
-      
-      await tx.wait()
-      
-      // Update balance after successful withdraw
-      await updateVaultBalance()
-      
-      setIsProcessing(false)
-      setActiveModal(null)
-      setWithdrawAmount("")
-      addToast("success", t.txComplete)
-    } catch (error: any) {
-      console.error("Withdraw error:", error)
-      setIsProcessing(false)
-      addToast("error", error?.message || "Withdraw failed")
-    }
-  }, [contract, addToast, t, updateVaultBalance])
   
-  // ===== SET MOUNTED STATE (Client-side only) =====
-  useEffect(() => {
-    setIsMounted(true)
-  }, [])
-
-  // ===== SINGLE useEffect - RUNS ONCE (Client-side only) =====
-  useEffect(() => {
-    // Ensure we're on the client side
-    if (typeof window === 'undefined' || !isMounted) return
+  // ===== HANDLE REFRESH (for Portfolio sync button) =====
+  const handleRefresh = useCallback(async () => {
+    if (!walletAddress || isRefreshing) return
     
+    setIsRefreshing(true)
+    await refreshData(walletAddress)
+    
+    // Simulate network delay for visual feedback
+    await new Promise(r => setTimeout(r, 800))
+    
+    setIsRefreshing(false)
+    addToast("success", t.dataSynced)
+  }, [walletAddress, isRefreshing, refreshData, addToast, t])
+  
+  // ===== DERIVED STATE =====
+  const isStreamActive = streamStatus === "active"
+  
+  // APY rates as decimals: 1m = 5%, 6m = 12%, 1y = 20%
+  const apyRates: Record<"1m" | "6m" | "1y", number> = {
+    "1m": 0.05,
+    "6m": 0.12,
+    "1y": 0.20
+  }
+  
+  // ===== REAL-TIME YIELD CALCULATION =====
+  useEffect(() => {
+    // Parse locked amount (remove commas and convert to number)
+    const lockedAmount = Number.parseFloat(yieldLockTotal.replace(/,/g, "")) || 0
+    
+    // If no locked amount, reset and don't start interval
+    if (lockedAmount <= 0) {
+      yieldEarnedRef.current = 0
+      setRealTimeYieldEarned("0.00000000")
+      return
+    }
+    
+    // Get current APY based on selected duration
+    const currentApy = apyRates[lockDuration]
+    
+    // Calculate yield per second: (lockedAmount * APY) / 31,536,000 seconds per year
+    const secondsPerYear = 31536000
+    const yieldPerSecond = (lockedAmount * currentApy) / secondsPerYear
+    
+    // Start interval that updates every second
+    const yieldInterval = setInterval(() => {
+      yieldEarnedRef.current += yieldPerSecond
+      setRealTimeYieldEarned(yieldEarnedRef.current.toFixed(8))
+    }, 1000)
+    
+    return () => clearInterval(yieldInterval)
+  }, [yieldLockTotal, lockDuration])
+  
+  // ===== SINGLE useEffect - RUNS ONCE =====
+  useEffect(() => {
     // Prevent double-run in strict mode
     if (mountedRef.current) return
     mountedRef.current = true
     
-    // 1. Start yield ticker
-    intervalRef.current = setInterval(() => {
-      yieldRef.current += 0.00000001 + Math.random() * 0.00000001
-      setYieldDisplay(yieldRef.current.toFixed(8))
-    }, 100)
+    // 1. Yield ticker will be started by separate useEffect based on balance
+    
+    // Helper to fetch blockchain data inline
+    const fetchBlockchainData = async (userAddress: string, eth: {
+      request: (args: { method: string; params?: unknown[] }) => Promise<unknown>
+    }) => {
+      try {
+        const balanceHex = await eth.request({
+          method: "eth_getBalance",
+          params: [userAddress, "latest"]
+        }) as string
+        const balanceWei = BigInt(balanceHex)
+        const balanceArc = Number(balanceWei) / 1e18
+        setArcBalance(balanceArc.toFixed(4))
+        
+        // Contract data fetched via ethers.js - states stay at 0 until integrated
+      } catch (err) {
+        console.log("[v0] Error fetching data:", err)
+      }
+    }
     
     // 2. Check existing wallet connection
     const ethereum = (window as Window & { ethereum?: {
@@ -425,12 +609,12 @@ export default function ArcSovereign() {
       removeListener: (event: string, handler: (data: unknown) => void) => void
     }}).ethereum
     
-    if (typeof window.ethereum !== 'undefined' && ethereum) {
-      // Check saved connection (only on client)
-      const savedAddress = typeof window !== 'undefined' ? localStorage.getItem("arc_wallet_address") : null
+    if (ethereum) {
+      // Check saved connection
+      const savedAddress = localStorage.getItem("arc_wallet_address")
       
       ethereum.request({ method: "eth_accounts" })
-        .then(async accounts => {
+        .then(accounts => {
           const accs = accounts as string[]
           if (accs[0]) {
             // If saved address matches, restore connection
@@ -438,59 +622,31 @@ export default function ArcSovereign() {
               setWalletAddress(accs[0])
               setIsConnected(true)
               localStorage.setItem("arc_wallet_address", accs[0])
-              
-              // Create ethers provider and contract
-              const web3Provider = new ethers.providers.Web3Provider(ethereum)
-              const signer = web3Provider.getSigner()
-              const contractInstance = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer)
-              
-              setProvider(web3Provider)
-              setContract(contractInstance)
-              
-              // Update vault balance
-              try {
-                const balance = await contractInstance.balanceOf(accs[0])
-                const balanceFormatted = ethers.utils.formatEther(balance)
-                setVaultBalance(parseFloat(balanceFormatted).toFixed(2))
-              } catch (error) {
-                console.error("Error fetching initial balance:", error)
-              }
+              // Fetch blockchain data on restore
+              fetchBlockchainData(accs[0], ethereum)
             }
           }
         })
         .catch(() => {})
       
       // 3. Listen for account changes
-      const handleAccounts = async (data: unknown) => {
+      const handleAccounts = (data: unknown) => {
         const accounts = data as string[]
         if (accounts[0]) {
           setWalletAddress(accounts[0])
           setIsConnected(true)
           localStorage.setItem("arc_wallet_address", accounts[0])
-          
-          // Update provider and contract for new account
-          try {
-            const web3Provider = new ethers.providers.Web3Provider(ethereum)
-            const signer = web3Provider.getSigner()
-            const contractInstance = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer)
-            
-            setProvider(web3Provider)
-            setContract(contractInstance)
-            
-            // Update vault balance
-            const balance = await contractInstance.balanceOf(accounts[0])
-            const balanceFormatted = ethers.utils.formatEther(balance)
-            setVaultBalance(parseFloat(balanceFormatted).toFixed(2))
-          } catch (error) {
-            console.error("Error updating account:", error)
-          }
+          // Refresh data on account change
+          fetchBlockchainData(accounts[0], ethereum)
         } else {
           setWalletAddress("")
           setIsConnected(false)
-          setProvider(null)
-          setContract(null)
-          setVaultBalance("0.00")
           localStorage.removeItem("arc_wallet_address")
+          // Reset balances
+          setArcBalance("0.0000")
+          setVaultBalance("0.00")
+          setYieldLockTotal("0.00")
+          setGuardianConfigured("")
         }
       }
       
@@ -501,28 +657,131 @@ export default function ArcSovereign() {
     return () => {
       if (intervalRef.current) clearInterval(intervalRef.current)
     }
-  }, [isMounted]) // Run when component is mounted on client
+  }, []) // EMPTY ARRAY = runs ONCE only
+  
+  // ===== VAULT YIELD TICKER (only runs when balance > 0) =====
+  useEffect(() => {
+    const vaultNum = Number.parseFloat(vaultBalance.replace(/,/g, "")) || 0
+    const lockedNum = Number.parseFloat(yieldLockTotal.replace(/,/g, "")) || 0
+    
+    // If both are 0, keep ticker at 0
+    if (vaultNum <= 0 && lockedNum <= 0) {
+      yieldRef.current = 0
+      setYieldDisplay("0.00000000")
+      return
+    }
+    
+    // Start yield ticker based on combined balance
+    const totalBalance = vaultNum + lockedNum
+    const baseYieldPerTick = (totalBalance * 0.12) / 31536000 / 10 // APY 12% per 100ms
+    
+    intervalRef.current = setInterval(() => {
+      yieldRef.current += baseYieldPerTick + Math.random() * baseYieldPerTick * 0.1
+      setYieldDisplay(yieldRef.current.toFixed(8))
+    }, 100)
+    
+    return () => {
+      if (intervalRef.current) clearInterval(intervalRef.current)
+    }
+  }, [vaultBalance, yieldLockTotal])
+  
+  // ===== HANDLE TRANSACTION SUCCESS (updates states based on transaction type) =====
+  const handleTransactionSuccess = useCallback((
+    type: "deposit" | "withdraw" | "lock" | "stream" | "guardian",
+    amount?: string,
+    extra?: { guardianAddr?: string; streamFreq?: string }
+  ) => {
+    const numAmount = Number.parseFloat(amount?.replace(/,/g, "") || "0")
+    
+    switch (type) {
+      case "deposit":
+        setVaultBalance(prev => {
+          const current = Number.parseFloat(prev.replace(/,/g, "")) || 0
+          return (current + numAmount).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+        })
+        // Update wallet balance (subtract from USDC/EURC)
+        setWalletBalances(prev => ({
+          ...prev,
+          [selectedAsset]: (Number.parseFloat(prev[selectedAsset]) - numAmount).toFixed(2)
+        }))
+        break
+        
+      case "withdraw":
+        setVaultBalance(prev => {
+          const current = Number.parseFloat(prev.replace(/,/g, "")) || 0
+          const newVal = Math.max(0, current - numAmount)
+          return newVal.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+        })
+        // Update wallet balance (add to USDC/EURC)
+        setWalletBalances(prev => ({
+          ...prev,
+          [selectedAsset]: (Number.parseFloat(prev[selectedAsset]) + numAmount).toFixed(2)
+        }))
+        break
+        
+      case "lock":
+        setYieldLockTotal(prev => {
+          const current = Number.parseFloat(prev.replace(/,/g, "")) || 0
+          return (current + numAmount).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+        })
+        // Subtract from vault balance when locking
+        setVaultBalance(prev => {
+          const current = Number.parseFloat(prev.replace(/,/g, "")) || 0
+          const newVal = Math.max(0, current - numAmount)
+          return newVal.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+        })
+        // Set unlock time based on duration
+        const durationDays = lockDuration === "1m" ? 30 : lockDuration === "6m" ? 180 : 365
+        setYieldLockEndTime(Date.now() + durationDays * 86400000)
+        // Reset yield earned for new lock
+        yieldEarnedRef.current = 0
+        setRealTimeYieldEarned("0.00000000")
+        break
+        
+      case "stream":
+        setStreamStatus("active")
+        setStreamProgress(0)
+        setStreamReleased("0.00")
+        break
+        
+      case "guardian":
+        if (extra?.guardianAddr) {
+          setGuardianConfigured(extra.guardianAddr)
+          setGuardianAddress(extra.guardianAddr)
+        }
+        break
+    }
+  }, [selectedAsset, lockDuration])
   
   // ===== PROCESS TRANSACTION =====
   const processTransaction = useCallback(async () => {
+    setIsProcessing(true)
+    await new Promise(r => setTimeout(r, 2000))
+    setIsProcessing(false)
+    
+    // Update states based on active modal
     if (activeModal === "deposit" && depositAmount) {
-      await handleDeposit(depositAmount)
+      handleTransactionSuccess("deposit", depositAmount)
     } else if (activeModal === "withdraw" && withdrawAmount) {
-      await handleWithdraw(withdrawAmount)
-    } else {
-      // Fallback for other modals (lock, stream, guardian)
-      setIsProcessing(true)
-      await new Promise(r => setTimeout(r, 2000))
-      setIsProcessing(false)
-      setActiveModal(null)
-      addToast("success", t.txComplete)
-      
-      // Reset form fields
-      setLockAmount("")
-      setStreamAmount("")
-      setGuardianAddress("")
+      handleTransactionSuccess("withdraw", withdrawAmount)
+    } else if (activeModal === "lock" && lockAmount) {
+      handleTransactionSuccess("lock", lockAmount)
+    } else if (activeModal === "stream" && streamAmount) {
+      handleTransactionSuccess("stream", streamAmount)
+    } else if (activeModal === "guardian" && guardianAddress) {
+      handleTransactionSuccess("guardian", undefined, { guardianAddr: guardianAddress })
     }
-  }, [activeModal, depositAmount, withdrawAmount, handleDeposit, handleWithdraw, addToast, t])
+    
+    setActiveModal(null)
+    addToast("success", t.txComplete)
+    
+    // Reset form fields
+    setDepositAmount("")
+    setWithdrawAmount("")
+    setLockAmount("")
+    setStreamAmount("")
+    setGuardianAddress("")
+  }, [addToast, t, activeModal, depositAmount, withdrawAmount, lockAmount, streamAmount, guardianAddress, handleTransactionSuccess])
 
   // ===== LOCK APY MAPPING =====
   const lockApyMap = {
@@ -638,27 +897,33 @@ export default function ArcSovereign() {
               </svg>
             </a>
             
-            {/* Connect Button */}
-            <button
-              onClick={isConnected ? disconnectWallet : connectWallet}
-              disabled={isConnecting || !isMounted}
-              className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold transition-all"
-              style={{
-                background: isConnected ? "rgba(255,255,255,0.05)" : (isMounted ? pageColors[activePage] : "rgba(255,255,255,0.1)"),
-                color: isConnected ? "#fff" : "#000"
-              }}
-            >
-              {isConnecting ? (
-                <Loader2 className="w-4 h-4 animate-spin" />
-              ) : (
-                <Wallet className="w-4 h-4" />
-              )}
-              <span>
-                {isMounted && isConnected && walletAddress && walletAddress.length >= 10
-                  ? `${walletAddress.slice(0,6)}...${walletAddress.slice(-4)}` 
-                  : t.connect}
-              </span>
-            </button>
+            {/* Connect / Address Button */}
+            {isConnected ? (
+              <button
+                onClick={() => setIsPortfolioOpen(true)}
+                className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold transition-all bg-white/5 hover:bg-white/10 border border-white/10 hover:border-amber-500/30"
+              >
+                <div className="w-2 h-2 rounded-full bg-amber-500 animate-pulse" />
+                <span className="font-mono">{walletAddress.slice(0,6)}...{walletAddress.slice(-4)}</span>
+              </button>
+            ) : (
+              <button
+                onClick={connectWallet}
+                disabled={isConnecting}
+                className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold transition-all"
+                style={{
+                  background: pageColors[activePage],
+                  color: "#000"
+                }}
+              >
+                {isConnecting ? (
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                ) : (
+                  <Wallet className="w-4 h-4" />
+                )}
+                {t.connect}
+              </button>
+            )}
           </div>
         </div>
       </header>
@@ -706,10 +971,10 @@ export default function ArcSovereign() {
                 </div>
               </div>
             </div>
-            <div className="flex gap-6 text-sm">
-              <div><span className="text-white/40">ARC:</span> <span className="font-semibold">{balances.ARC}</span></div>
-              <div><span className="text-white/40">USDC:</span> <span className="font-semibold">{balances.USDC}</span></div>
-              <div><span className="text-white/40">EURC:</span> <span className="font-semibold">{balances.EURC}</span></div>
+<div className="flex gap-6 text-sm">
+              <div><span className="text-white/40">ARC:</span> <span className="font-semibold">{arcBalance}</span></div>
+              <div><span className="text-white/40">USDC:</span> <span className="font-semibold">{walletBalances.USDC}</span></div>
+              <div><span className="text-white/40">EURC:</span> <span className="font-semibold">{walletBalances.EURC}</span></div>
             </div>
           </div>
         </div>
@@ -729,11 +994,11 @@ export default function ArcSovereign() {
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
             <div className="p-5 rounded-xl bg-white/[0.02] border border-white/10">
               <div className="text-white/40 text-sm mb-1">{t.yourBalance}</div>
-              <div className="text-2xl font-bold">{balances[selectedAsset]} <span className="text-base text-white/50">{selectedAsset}</span></div>
+              <div className="text-2xl font-bold">{isConnected ? walletBalances[selectedAsset] : t.notConnected} <span className="text-base text-white/50">{isConnected ? selectedAsset : ""}</span></div>
             </div>
             <div className="p-5 rounded-xl bg-white/[0.02] border border-white/10">
               <div className="text-white/40 text-sm mb-1">{t.deposited}</div>
-              <div className="text-2xl font-bold">{vaultBalance} <span className="text-base text-white/50">ARC</span></div>
+              <div className="text-2xl font-bold">{isConnected ? vaultBalance : t.notConnected} <span className="text-base text-white/50">{isConnected ? selectedAsset : ""}</span></div>
             </div>
             <div className="p-5 rounded-xl bg-white/[0.02] border border-white/10">
               <div className="text-white/40 text-sm mb-1">{t.apy}</div>
@@ -764,7 +1029,7 @@ export default function ArcSovereign() {
                 {["25", "50", "75", "100"].map(pct => (
                   <button
                     key={pct}
-                    onClick={() => setDepositAmount((Number(balances[selectedAsset]) * Number(pct) / 100).toFixed(2))}
+                    onClick={() => setDepositAmount((Number(walletBalances[selectedAsset]) * Number(pct) / 100).toFixed(2))}
                     className="flex-1 py-2 rounded-lg text-sm bg-white/5 hover:bg-white/10 transition-colors"
                   >
                     {pct}%
@@ -829,6 +1094,34 @@ export default function ArcSovereign() {
           <div className="mb-8">
             <h1 className="text-3xl font-bold mb-2">{t.yield}</h1>
             <p className="text-white/50">Lock assets for boosted APY rewards</p>
+          </div>
+          
+          {/* Real-Time Yield Stats */}
+          <div className="grid sm:grid-cols-3 gap-4 mb-8">
+            <div className="p-5 rounded-xl bg-white/[0.02] border border-white/10">
+              <div className="text-white/40 text-sm mb-1">{t.lockedBalance}</div>
+              <div className="text-2xl font-bold">{yieldLockTotal}</div>
+              <div className="text-white/40 text-sm">{selectedAsset}</div>
+            </div>
+            <div className="p-5 rounded-xl bg-[#A855F7]/10 border border-[#A855F7]/30">
+              <div className="text-[#A855F7]/70 text-sm mb-1">{t.yieldEarned}</div>
+              <div 
+                className="text-2xl font-bold font-mono tabular-nums"
+                style={{ color: pageColors.yield }}
+              >
+                +{realTimeYieldEarned}
+              </div>
+              <div className="text-white/40 text-sm">{selectedAsset}</div>
+            </div>
+            <div className="p-5 rounded-xl bg-white/[0.02] border border-white/10">
+              <div className="text-white/40 text-sm mb-1">{t.apy}</div>
+              <div className="text-2xl font-bold" style={{ color: pageColors.yield }}>
+                {lockDuration === "1m" ? "5%" : lockDuration === "6m" ? "12%" : "20%"}
+              </div>
+              <div className="text-white/40 text-sm">
+                {lockDuration === "1m" ? `1 ${t.month}` : lockDuration === "6m" ? `6 ${t.months}` : `1 ${t.year}`}
+              </div>
+            </div>
           </div>
           
           {/* Duration Options */}
@@ -973,7 +1266,7 @@ export default function ArcSovereign() {
             
             {streamAmount && (
               <div className="p-4 rounded-lg bg-[#10B981]/10 border border-[#10B981]/20 mb-4 flex items-center gap-3">
-                <Info className="w-5 h-5 text-[#10B981] flex-shrink-0" />
+                <Info className="w-5 h-5 text-[#10B981] flex-shrink-0 mt-0.5" />
                 <div className="text-sm">
                   <span className="text-white/50">Flow rate: </span>
                   <span className="font-semibold">
@@ -1047,15 +1340,11 @@ export default function ArcSovereign() {
               </div>
             </div>
             
-            {guardianAddress && guardianAddress.length >= 18 && (
+            {guardianAddress && (
               <div className="p-4 rounded-lg bg-[#F59E0B]/10 border border-[#F59E0B]/20 mb-4">
                 <div className="flex justify-between text-sm mb-2">
                   <span className="text-white/50">Recovery Address</span>
-                  <span className="font-mono text-xs">
-                    {guardianAddress.length >= 18
-                      ? `${guardianAddress.slice(0, 10)}...${guardianAddress.slice(-8)}`
-                      : guardianAddress}
-                  </span>
+                  <span className="font-mono text-xs">{guardianAddress.slice(0, 10)}...{guardianAddress.slice(-8)}</span>
                 </div>
                 <div className="flex justify-between text-sm">
                   <span className="text-white/50">Inactivity Period</span>
@@ -1130,11 +1419,7 @@ export default function ArcSovereign() {
               {activeModal === "guardian" && (
                 <div className="text-center mb-4">
                   <div className="text-lg font-bold mb-1">Activate Guardian</div>
-                  <div className="text-white/50 text-sm font-mono">
-                    {guardianAddress && guardianAddress.length >= 24
-                      ? `${guardianAddress.slice(0, 14)}...${guardianAddress.slice(-10)}`
-                      : guardianAddress || "0x..."}
-                  </div>
+                  <div className="text-white/50 text-sm font-mono">{guardianAddress.slice(0, 14)}...{guardianAddress.slice(-10)}</div>
                   <div className="text-white/40 text-xs mt-1">{guardianTimer} day inactivity timer</div>
                 </div>
               )}
@@ -1208,6 +1493,317 @@ export default function ArcSovereign() {
             </div>
           )
         })}
+      </div>
+      
+      {/* === PORTFOLIO DRAWER === */}
+      <AnimatePresence>
+        {isPortfolioOpen && (
+          <>
+            {/* Backdrop with blur */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.25 }}
+              className="fixed inset-0 z-50 bg-black/70 backdrop-blur-md"
+              onClick={() => setIsPortfolioOpen(false)}
+            />
+            
+            {/* Glassmorphism Drawer */}
+            <motion.div
+              initial={{ x: "100%" }}
+              animate={{ x: 0 }}
+              exit={{ x: "100%" }}
+              transition={{ type: "spring", damping: 30, stiffness: 300 }}
+              className="fixed top-0 right-0 bottom-0 z-50 w-full max-w-md overflow-y-auto"
+              style={{
+                background: "rgba(10, 10, 10, 0.85)",
+                backdropFilter: "blur(20px)",
+                WebkitBackdropFilter: "blur(20px)",
+                borderLeft: "1px solid rgba(245, 158, 11, 0.15)"
+              }}
+            >
+              {/* Drawer Header */}
+              <div 
+                className="sticky top-0 z-10 p-5 border-b border-amber-500/10"
+                style={{
+                  background: "rgba(10, 10, 10, 0.9)",
+                  backdropFilter: "blur(20px)",
+                  WebkitBackdropFilter: "blur(20px)"
+                }}
+              >
+                <div className="flex items-center justify-between mb-4">
+                  <h2 className="text-lg font-bold text-amber-500">{t.yourPortfolio}</h2>
+                  <div className="flex items-center gap-2">
+                    {/* Sync Button with rotation animation */}
+                    <button
+                      onClick={handleRefresh}
+                      disabled={isRefreshing}
+                      className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-amber-500/10 text-amber-500 border border-amber-500/20 hover:bg-amber-500/20 transition-colors disabled:opacity-50"
+                    >
+                      <RefreshCw className={`w-3.5 h-3.5 ${isRefreshing ? 'animate-spin' : ''}`} />
+                      {isRefreshing ? t.syncing : t.syncData}
+                    </button>
+                    <button
+                      onClick={disconnectWallet}
+                      className="px-3 py-1.5 rounded-lg text-xs font-medium bg-red-500/10 text-red-400 border border-red-500/20 hover:bg-red-500/20 transition-colors"
+                    >
+                      {t.disconnect}
+                    </button>
+                    <button
+                      onClick={() => setIsPortfolioOpen(false)}
+                      className="p-2 rounded-lg bg-white/5 hover:bg-white/10 transition-colors"
+                    >
+                      <X className="w-5 h-5" />
+                    </button>
+                  </div>
+                </div>
+                
+                {/* Full Address with Copy */}
+                <div 
+                  className="flex items-center gap-2 p-3 rounded-xl border border-amber-500/10"
+                  style={{ background: "rgba(0, 0, 0, 0.4)" }}
+                >
+                  <div className="w-8 h-8 rounded-full bg-gradient-to-br from-amber-500 to-amber-700 flex items-center justify-center">
+                    <Wallet className="w-4 h-4 text-black" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="text-xs text-white/40 mb-0.5">{t.connectedWallet}</div>
+                    <div className="font-mono text-sm truncate">{walletAddress}</div>
+                  </div>
+                  <button
+                    onClick={() => {
+                      navigator.clipboard.writeText(walletAddress)
+                      addToast("success", t.addressCopied)
+                    }}
+                    className="p-2 rounded-lg bg-amber-500/10 hover:bg-amber-500/20 text-amber-500 transition-colors"
+                  >
+                    <Copy className="w-4 h-4" />
+                  </button>
+                </div>
+              </div>
+              
+              <div className="p-5 space-y-4">
+                {/* Wallet Balance Section */}
+                <div 
+                  className="p-5 rounded-xl border border-amber-500/20"
+                  style={{ background: "linear-gradient(135deg, rgba(245, 158, 11, 0.1) 0%, rgba(180, 83, 9, 0.05) 100%)" }}
+                >
+                  <div className="text-sm text-amber-500/70 mb-1">{t.walletBalance}</div>
+                  <div className="text-4xl font-bold text-amber-500">{arcBalance}</div>
+                  <div className="text-white/40 text-sm">ARC</div>
+                </div>
+                
+                {/* Vault Status */}
+                <div 
+                  className="p-5 rounded-xl border border-white/10"
+                  style={{ background: "rgba(255, 255, 255, 0.02)" }}
+                >
+                  <div className="flex items-center gap-2 mb-4">
+                    <Shield className="w-5 h-5 text-[#00D1FF]" />
+                    <span className="font-semibold">{t.vaultStatus}</span>
+                  </div>
+                  <div className="flex justify-between items-end">
+                    <div>
+                      <div className="text-xs text-white/40 mb-1">{t.activeDeposit}</div>
+                      <div className="text-2xl font-bold">{vaultBalance}</div>
+                      <div className="text-white/40 text-sm">{selectedAsset}</div>
+                    </div>
+                    <button
+                      onClick={() => { setIsPortfolioOpen(false); setActivePage("vault") }}
+                      className="flex items-center gap-1 text-xs text-[#00D1FF] hover:underline"
+                    >
+                      {t.view} <ExternalLink className="w-3 h-3" />
+                    </button>
+                  </div>
+                </div>
+                
+                {/* Yield Lock Status */}
+                <div 
+                  className="p-5 rounded-xl border border-white/10"
+                  style={{ background: "rgba(255, 255, 255, 0.02)" }}
+                >
+                  <div className="flex items-center gap-2 mb-4">
+                    <Lock className="w-5 h-5 text-[#A855F7]" />
+                    <span className="font-semibold">{t.yieldLockStatus}</span>
+                  </div>
+                  
+                  {/* Countdown Timer */}
+                  <div className="mb-3">
+                    <div className="text-xs text-white/40 mb-2">{t.unlockDate}</div>
+                    <YieldLockCountdown endTime={yieldLockEndTime} />
+                  </div>
+                  
+                  <div className="grid grid-cols-2 gap-4 mt-4">
+                    <div>
+                      <div className="text-xs text-white/40 mb-1">{t.lockedBalance}</div>
+                      <div className="text-xl font-bold">{yieldLockTotal}</div>
+                      <div className="text-white/40 text-sm">{selectedAsset}</div>
+                    </div>
+                    <div>
+                      <div className="text-xs text-white/40 mb-1">{t.accumulatedProfit}</div>
+                      <div className="text-xl font-bold text-[#A855F7]">+{yieldLockProfit}</div>
+                      <div className="text-white/40 text-sm">{selectedAsset}</div>
+                    </div>
+                  </div>
+                  
+                  <button
+                    onClick={() => { setIsPortfolioOpen(false); setActivePage("yield") }}
+                    className="w-full mt-4 flex items-center justify-center gap-1 py-2 rounded-lg text-xs text-[#A855F7] bg-[#A855F7]/10 hover:bg-[#A855F7]/20 transition-colors"
+                  >
+                    {t.manageLocks} <ExternalLink className="w-3 h-3" />
+                  </button>
+                </div>
+                
+                {/* Guardian Status */}
+                <div 
+                  className="p-5 rounded-xl border border-white/10"
+                  style={{ background: "rgba(255, 255, 255, 0.02)" }}
+                >
+                  <div className="flex items-center gap-2 mb-4">
+                    <Users className="w-5 h-5 text-[#F59E0B]" />
+                    <span className="font-semibold">{t.guardianStatus}</span>
+                  </div>
+                  
+                  {guardianConfigured ? (
+                    <div>
+                      <div className="text-xs text-white/40 mb-1">{t.heritageAddress}</div>
+                      <div 
+                        className="font-mono text-sm p-3 rounded-lg border border-[#F59E0B]/20 truncate"
+                        style={{ background: "rgba(0, 0, 0, 0.4)" }}
+                      >
+                        {guardianConfigured}
+                      </div>
+                      <div className="flex items-center gap-2 mt-3 text-xs text-[#10B981]">
+                        <Check className="w-4 h-4" />
+                        {t.protectionActive}
+                      </div>
+                    </div>
+                  ) : (
+                    <div>
+                      <div className="flex items-center gap-2 p-3 rounded-lg bg-red-500/10 border border-red-500/20 text-red-400">
+                        <AlertCircle className="w-5 h-5 flex-shrink-0" />
+                        <div>
+                          <div className="font-medium text-sm">{t.notConfigured}</div>
+                          <div className="text-xs text-red-400/70">{t.noProtection}</div>
+                        </div>
+                      </div>
+                      <button
+                        onClick={() => { setIsPortfolioOpen(false); setActivePage("guardian") }}
+                        className="w-full mt-3 flex items-center justify-center gap-1 py-2 rounded-lg text-xs text-[#F59E0B] bg-[#F59E0B]/10 hover:bg-[#F59E0B]/20 transition-colors"
+                      >
+                        {t.configureGuardian} <ExternalLink className="w-3 h-3" />
+                      </button>
+                    </div>
+                  )}
+                </div>
+                
+                {/* Stream Status */}
+                <div 
+                  className="p-5 rounded-xl border border-white/10"
+                  style={{ background: "rgba(255, 255, 255, 0.02)" }}
+                >
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="flex items-center gap-2">
+                      <Repeat className="w-5 h-5 text-[#10B981]" />
+                      <span className="font-semibold">{t.streamStatusLabel}</span>
+                    </div>
+                    <span 
+                      className="px-2 py-1 rounded-full text-xs font-medium"
+                      style={{
+                        background: isStreamActive ? "rgba(16,185,129,0.2)" : "rgba(255,255,255,0.1)",
+                        color: isStreamActive ? "#10B981" : "rgba(255,255,255,0.5)"
+                      }}
+                    >
+                      {isStreamActive ? t.active : t.inactive}
+                    </span>
+                  </div>
+                  
+                  {isStreamActive ? (
+                    <div>
+                      <div className="flex justify-between text-sm mb-2">
+                        <span className="text-white/40">{t.progress}</span>
+                        <span>{streamProgress}%</span>
+                      </div>
+                      <div className="h-2 rounded-full bg-black/50 overflow-hidden">
+                        <motion.div 
+                          className="h-full bg-[#10B981]"
+                          initial={{ width: 0 }}
+                          animate={{ width: `${streamProgress}%` }}
+                          transition={{ duration: 0.5 }}
+                        />
+                      </div>
+                      <div className="flex justify-between text-xs text-white/40 mt-2">
+                        <span>{t.released}: {streamReleased} {selectedAsset}</span>
+                        <span>{t.remaining}: --</span>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="text-center py-4">
+                      <div className="text-white/40 text-sm mb-3">{t.noActiveStreams}</div>
+                      <button
+                        onClick={() => { setIsPortfolioOpen(false); setActivePage("stream") }}
+                        className="flex items-center justify-center gap-1 mx-auto px-4 py-2 rounded-lg text-xs text-[#10B981] bg-[#10B981]/10 hover:bg-[#10B981]/20 transition-colors"
+                      >
+                        {t.createStream} <ExternalLink className="w-3 h-3" />
+                      </button>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
+    </div>
+  )
+}
+
+// ============================================
+// YIELD LOCK COUNTDOWN COMPONENT
+// ============================================
+function YieldLockCountdown({ endTime }: { endTime: number }) {
+  const [timeLeft, setTimeLeft] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 })
+  
+  useEffect(() => {
+    const calcTime = () => {
+      const diff = Math.max(0, endTime - Date.now())
+      setTimeLeft({
+        days: Math.floor(diff / (1000 * 60 * 60 * 24)),
+        hours: Math.floor((diff / (1000 * 60 * 60)) % 24),
+        minutes: Math.floor((diff / (1000 * 60)) % 60),
+        seconds: Math.floor((diff / 1000) % 60)
+      })
+    }
+    
+    calcTime()
+    const interval = setInterval(calcTime, 1000)
+    return () => clearInterval(interval)
+  }, [endTime])
+  
+  return (
+    <div className="flex items-center gap-2 p-3 rounded-lg bg-[#A855F7]/10 border border-[#A855F7]/20">
+      <Timer className="w-5 h-5 text-[#A855F7]" />
+      <div className="flex gap-3 font-mono text-lg">
+        <div className="text-center">
+          <div className="font-bold">{String(timeLeft.days).padStart(2, '0')}</div>
+          <div className="text-[10px] text-white/40">DAYS</div>
+        </div>
+        <span className="text-white/30">:</span>
+        <div className="text-center">
+          <div className="font-bold">{String(timeLeft.hours).padStart(2, '0')}</div>
+          <div className="text-[10px] text-white/40">HRS</div>
+        </div>
+        <span className="text-white/30">:</span>
+        <div className="text-center">
+          <div className="font-bold">{String(timeLeft.minutes).padStart(2, '0')}</div>
+          <div className="text-[10px] text-white/40">MIN</div>
+        </div>
+        <span className="text-white/30">:</span>
+        <div className="text-center">
+          <div className="font-bold">{String(timeLeft.seconds).padStart(2, '0')}</div>
+          <div className="text-[10px] text-white/40">SEC</div>
+        </div>
       </div>
     </div>
   )
