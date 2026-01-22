@@ -1042,7 +1042,7 @@ text
         
         {/* Twitter/X Link */}
         <a
-          href="https://x.com/ArcProtocol"
+          href="https://x.com/MATHULOTACRYPTO"
           target="_blank"
           rel="noopener noreferrer"
           className="hidden sm:flex items-center justify-center w-9 h-9 rounded-lg bg-white/5 hover:bg-white/10 transition-colors"
