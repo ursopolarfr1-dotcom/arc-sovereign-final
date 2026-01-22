@@ -379,35 +379,55 @@ export default function ArcSovereign() {
     }
   }, [])
 
-  // ===== CONEXÃO DA CARTEIRA =====
-  const connectWallet = useCallback(async () => {
-    const eth = (window as any).ethereum
-    if (!eth) return addToast("error", t.installWallet)
-    
-    setIsConnecting(true)
-    try {
-      const accounts = await eth.request({ method: "eth_requestAccounts" })
-      setWalletAddress(accounts[0])
-      setIsConnected(true)
-      localStorage.setItem("arc_wallet_address", accounts[0])
-      refreshData(accounts[0])
-      addToast("success", t.connected)
-    } catch {
-      addToast("error", "Failed to connect")
-    }
-    setIsConnecting(false)
-  }, [t, addToast, refreshData])
+      // ===== CONEXÃO DA CARTEIRA =====
+    const connectWallet = useCallback(async () => {
+      const eth = (window as any).ethereum
+      if (!eth) return addToast("error", t.installWallet)
+      
+      setIsConnecting(true)
+      try {
+        const accounts = await eth.request({ method: "eth_requestAccounts" })
+        setWalletAddress(accounts[0])
+        setIsConnected(true)
+        localStorage.setItem("arc_wallet_address", accounts[0])
+        refreshData(accounts[0])
+        addToast("success", t.connected)
+        
+        // --- ADICIONE ESTA VERIFICAÇÃO AQUI ---
+        const currentChainId = await eth.request({ method: "eth_chainId" });
+        const arcChainId = "0x1F9"; // 505 em Hexadecimal
 
-  const disconnectWallet = () => {
-    setIsConnected(false)
-    setWalletAddress("")
-    setArcBalance("0.0000")
-    setVaultBalance("0.00")
-    setYieldLockTotal("0.00")
-    setRealTimeYieldEarned("0.00000000")
-    yieldEarnedRef.current = 0
-    localStorage.removeItem("arc_wallet_address")
-  }
+        if (currentChainId !== arcChainId) {
+          try {
+            // Tenta apenas trocar de rede primeiro
+            await eth.request({
+              method: "wallet_switchEthereumChain",
+              params: [{ chainId: arcChainId }],
+            });
+          } catch (switchError: any) {
+            // Se a rede não existir na carteira (erro 4902), aí sim pede para adicionar
+            if (switchError.code === 4902) {
+              await eth.request({
+                method: "wallet_addEthereumChain",
+                params: [{
+                  chainId: arcChainId,
+                  chainName: "Arc Testnet",
+                  nativeCurrency: { name: "ARC", symbol: "ARC", decimals: 18 },
+                  rpcUrls: ["https://rpc.testnet.arc.network"],
+                  blockExplorerUrls: ["https://explorer.testnet.arc.network"]
+                }]
+              });
+            }
+          }
+        }
+        // ---------------------------------------
+
+      } catch (error) {
+        console.error("Erro ao conectar:", error)
+        addToast("error", "Failed to connect")
+      }
+      setIsConnecting(false)
+    }, [t, addToast, refreshData])
 
   // ===== CÁLCULO DE RENDIMENTO EM TEMPO REAL =====
   useEffect(() => {
